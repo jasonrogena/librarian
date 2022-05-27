@@ -1,0 +1,25 @@
+[libraries.shows]
+command = """
+echo "{file_path} is a show episode. The file's MIME type is {mime_type}"
+"""
+
+  [libraries.shows.filter]
+  directories = [ "~/Downloads/shows", "~/Downloads/transmission/shows" ]
+  mime_type_regexes = [ "video\\/.+" ]
+
+[libraries.movies]
+command = """
+echo "{file_path} is a movie. The file's MIME type is {mime_type}"
+"""
+
+  [libraries.movies.filter]
+  directories = [ "~/Downloads/movies", "~/Downloads/transmission/movies" ]
+
+[libraries.books]
+command = """
+echo "{file_path} is a book. The file's MIME type is {mime_type}"
+"""
+
+  [libraries.books.filter]
+  directories = [ "~/Downloads/books", "~/Downloads/transmission/books" ]
+  mime_type_regexes = [ "application\\/pdf", "text\\/plain" ]

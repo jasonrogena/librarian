@@ -1,0 +1,7 @@
+[libraries.shows]
+command = """
+echo "{file_path} is a show episode. The file's MIME type is {mime_type}"
+"""
+
+  [libraries.shows.filter]
+  mime_type_regexes = [ "video\\/.+" ]
