@@ -1,20 +1,13 @@
 use super::*;
+use std::env;
 
 #[test]
 fn test_is_of_type() {
-    let ok_test_cases = [
+    let mut ok_test_cases = vec![
         (File::new("tests/files/bmp".to_string()), "image/bmp"),
         (File::new("tests/files/flac".to_string()), "audio/flac"),
         (File::new("tests/files/gif".to_string()), "image/gif"),
         (File::new("tests/files/mpeg".to_string()), "audio/mpeg"),
-        (
-            File::new("tests/files/ogg".to_string()),
-            "audio/x-vorbis+ogg",
-        ),
-        (
-            File::new("tests/files/opus".to_string()),
-            "audio/x-opus+ogg",
-        ),
         (File::new("tests/files/pdf".to_string()), "application/pdf"),
         (File::new("tests/files/plain".to_string()), "text/plain"),
         (File::new("tests/files/png".to_string()), "image/png"),
@@ -42,6 +35,19 @@ fn test_is_of_type() {
         (File::new("tests/files/x-tga".to_string()), "image/x-tga"),
         (File::new("tests/files/zip".to_string()), "application/zip"),
     ];
+    if env::consts::OS == "linux" {
+        ok_test_cases.push((File::new("tests/files/ogg".to_string()), "video/ogg"));
+        ok_test_cases.push((File::new("tests/files/opus".to_string()), "video/ogg"));
+    } else if env::consts::OS == "macos" {
+        ok_test_cases.push((
+            File::new("tests/files/ogg".to_string()),
+            "audio/x-vorbis+ogg",
+        ));
+        ok_test_cases.push((
+            File::new("tests/files/opus".to_string()),
+            "audio/x-opus+ogg",
+        ));
+    }
     for cur_case in ok_test_cases.iter() {
         assert_eq!(cur_case.0.get_mime_type().unwrap(), cur_case.1);
     }
@@ -51,14 +57,11 @@ fn test_is_of_type() {
         "Unable to open file",
     )];
     for cur_case in err_test_cases.iter() {
-        assert_eq!(
-            cur_case
-                .0
-                .get_mime_type()
-                .unwrap_err()
-                .get_message()
-                .contains(cur_case.1),
-            true
-        );
+        assert!(cur_case
+            .0
+            .get_mime_type()
+            .unwrap_err()
+            .get_message()
+            .contains(cur_case.1));
     }
 }

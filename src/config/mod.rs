@@ -7,23 +7,27 @@ use std::fs;
 mod tests;
 
 #[derive(Debug, Deserialize)]
+#[allow(dead_code)]
 pub struct Config {
     libraries: HashMap<String, Libraries>,
 }
 
 #[derive(Debug, Deserialize)]
+#[allow(dead_code)]
 pub struct Libraries {
     command: String,
     filter: Filter,
 }
 
 #[derive(Debug, Deserialize)]
+#[allow(dead_code)]
 pub struct Filter {
     directories: Vec<String>,
     mime_type_regexes: Option<Vec<String>>,
 }
 
 impl Config {
+    #[allow(dead_code)]
     pub fn new(config_path: &str) -> std::result::Result<Config, error::Error> {
         let contents = match fs::read_to_string(config_path) {
             Ok(c) => c,

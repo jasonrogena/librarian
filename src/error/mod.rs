@@ -7,9 +7,11 @@ pub struct Error {
 }
 
 impl Error {
+    #[allow(dead_code)]
     pub fn new(msg: String) -> Error {
         Error { message: msg }
     }
+    #[allow(dead_code)]
     pub fn get_message(&self) -> &String {
         &self.message
     }
