@@ -1,16 +1,19 @@
 use std::error;
 use std::fmt;
 
+#[cfg(test)]
+mod tests;
+
 #[derive(Debug)]
 pub struct Error {
     message: String,
 }
 
 impl Error {
-    #[allow(dead_code)]
     pub fn new(msg: String) -> Error {
         Error { message: msg }
     }
+
     #[allow(dead_code)]
     pub fn get_message(&self) -> &String {
         &self.message

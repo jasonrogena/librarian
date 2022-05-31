@@ -9,21 +9,21 @@ mod tests;
 #[derive(Debug, Deserialize)]
 #[allow(dead_code)]
 pub struct Config {
-    libraries: HashMap<String, Libraries>,
+    pub libraries: HashMap<String, Libraries>,
 }
 
 #[derive(Debug, Deserialize)]
 #[allow(dead_code)]
 pub struct Libraries {
-    command: String,
-    filter: Filter,
+    pub command: String,
+    pub filter: Filter,
 }
 
 #[derive(Debug, Deserialize)]
 #[allow(dead_code)]
 pub struct Filter {
-    directories: Vec<String>,
-    mime_type_regexes: Option<Vec<String>>,
+    pub directories: Vec<String>,
+    pub mime_type_regexes: Option<Vec<String>>,
 }
 
 impl Config {
