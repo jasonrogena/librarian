@@ -4,47 +4,68 @@ use std::env;
 #[test]
 fn test_is_of_type() {
     let mut ok_test_cases = vec![
-        (File::new("tests/files/bmp".to_string()), "image/bmp"),
-        (File::new("tests/files/flac".to_string()), "audio/flac"),
-        (File::new("tests/files/gif".to_string()), "image/gif"),
-        (File::new("tests/files/mpeg".to_string()), "audio/mpeg"),
-        (File::new("tests/files/pdf".to_string()), "application/pdf"),
-        (File::new("tests/files/plain".to_string()), "text/plain"),
-        (File::new("tests/files/png".to_string()), "image/png"),
-        (File::new("tests/files/tiff".to_string()), "image/tiff"),
+        (File::new("tests/files/image/bmp".to_string()), "image/bmp"),
         (
-            File::new("tests/files/wav".to_string()),
+            File::new("tests/files/audio/flac".to_string()),
+            "audio/flac",
+        ),
+        (File::new("tests/files/image/gif".to_string()), "image/gif"),
+        (
+            File::new("tests/files/video/mpeg".to_string()),
+            "audio/mpeg",
+        ),
+        (
+            File::new("tests/files/text/pdf".to_string()),
+            "application/pdf",
+        ),
+        (
+            File::new("tests/files/text/plain".to_string()),
+            "text/plain",
+        ),
+        (File::new("tests/files/image/png".to_string()), "image/png"),
+        (
+            File::new("tests/files/image/tiff".to_string()),
+            "image/tiff",
+        ),
+        (
+            File::new("tests/files/audio/wav".to_string()),
             "application/x-riff",
         ),
         (
-            File::new("tests/files/x-7z-compressed".to_string()),
+            File::new("tests/files/archive/x-7z-compressed".to_string()),
             "application/x-7z-compressed",
         ),
         (
-            File::new("tests/files/x-pcx".to_string()),
+            File::new("tests/files/image/x-pcx".to_string()),
             "image/vnd.zbrush.pcx",
         ),
         (
-            File::new("tests/files/x-portable-bitmap".to_string()),
+            File::new("tests/files/image/x-portable-bitmap".to_string()),
             "image/x-portable-bitmap",
         ),
         (
-            File::new("tests/files/x-tar".to_string()),
+            File::new("tests/files/archive/x-tar".to_string()),
             "application/x-tar",
         ),
-        (File::new("tests/files/x-tga".to_string()), "image/x-tga"),
-        (File::new("tests/files/zip".to_string()), "application/zip"),
+        (
+            File::new("tests/files/image/x-tga".to_string()),
+            "image/x-tga",
+        ),
+        (
+            File::new("tests/files/archive/zip".to_string()),
+            "application/zip",
+        ),
     ];
     if env::consts::OS == "linux" {
-        ok_test_cases.push((File::new("tests/files/ogg".to_string()), "video/ogg"));
-        ok_test_cases.push((File::new("tests/files/opus".to_string()), "video/ogg"));
-    } else if env::consts::OS == "macos" {
+        ok_test_cases.push((File::new("tests/files/audio/ogg".to_string()), "video/ogg"));
+        ok_test_cases.push((File::new("tests/files/audio/opus".to_string()), "video/ogg"));
+    } else {
         ok_test_cases.push((
-            File::new("tests/files/ogg".to_string()),
+            File::new("tests/files/audio/ogg".to_string()),
             "audio/x-vorbis+ogg",
         ));
         ok_test_cases.push((
-            File::new("tests/files/opus".to_string()),
+            File::new("tests/files/audio/opus".to_string()),
             "audio/x-opus+ogg",
         ));
     }

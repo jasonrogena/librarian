@@ -81,4 +81,4 @@ jobs:
           sudo apt-get update
           sudo apt-get install gcc-9-multilib lib32gcc-9-dev
       - name: Run tests
-        run: make test
+        run: make clean test
