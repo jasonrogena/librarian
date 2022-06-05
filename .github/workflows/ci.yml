@@ -82,3 +82,10 @@ jobs:
           sudo apt-get install gcc-9-multilib lib32gcc-9-dev
       - name: Run tests
         run: make clean test
+      - name: Generate code coverage
+        run: make clean coverage
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: target/lcov.info
+          fail_ci_if_error: true
