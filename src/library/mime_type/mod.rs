@@ -32,18 +32,15 @@ impl File {
         };
 
         let mut buf = Vec::with_capacity(MAX_FILE_READ_BYTES as usize);
-        match file_obj
+        if let Err(e) = file_obj
             .by_ref()
             .take(MAX_FILE_READ_BYTES)
             .read_to_end(&mut buf)
         {
-            Err(e) => {
-                return Err(error::Error::new(format!(
-                    "Unable to read file '{}' to test its type: {}",
-                    self.path, e
-                )))
-            }
-            _ => println!("Checking file type for '{}'", self.path),
+            return Err(error::Error::new(format!(
+                "Unable to read file '{}' to test its type: {}",
+                self.path, e
+            )));
         }
 
         let mime_type = tree_magic::from_u8(buf.as_slice());

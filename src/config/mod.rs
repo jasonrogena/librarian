@@ -28,7 +28,7 @@ pub struct Filter {
 
 impl Config {
     #[allow(dead_code)]
-    pub fn new(config_path: &str) -> std::result::Result<Config, error::Error> {
+    pub fn new(config_path: &String) -> std::result::Result<Config, error::Error> {
         let contents = match fs::read_to_string(config_path) {
             Ok(c) => c,
             Err(e) => {

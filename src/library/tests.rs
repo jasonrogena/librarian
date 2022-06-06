@@ -8,9 +8,9 @@ use std::path::PathBuf;
 #[test]
 fn test_process() {
     let conf = if env::consts::OS == "windows" {
-        config::Config::new("tests\\configs\\good-windows.toml")
+        config::Config::new(&"tests\\configs\\good-windows.toml".to_string())
     } else {
-        config::Config::new("tests/configs/good.toml")
+        config::Config::new(&"tests/configs/good.toml".to_string())
     };
     let mut test_cases: HashMap<String, (Vec<String>, String)> = HashMap::new();
     if env::consts::OS == "linux" {
