@@ -141,10 +141,7 @@ impl Library {
                 "Got an error while running command against file '{}': {}",
                 path, e
             ))),
-            Ok(o) => {
-                println!("{:?}", o);
-                Ok(true)
-            }
+            Ok(_) => Ok(true),
         }
     }
 }
