@@ -23,3 +23,6 @@ echo "{{ file_path }} is a book. The file's MIME type is {{ mime_type }}"  > tes
 
   [libraries.books.filter]
   directories = [ "tests\\files\\text" ]
+
+[fs_watch]
+notification_ttl = 60

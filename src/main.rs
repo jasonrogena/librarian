@@ -1,9 +1,13 @@
 mod config;
 mod error;
+mod fs_notify;
 mod library;
 mod template;
 use clap::{Parser, Subcommand};
+use std::collections::HashSet;
+use std::path::Path;
 use std::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::mpsc::channel;
 use std::thread;
 use std::time::Duration;
 
@@ -40,7 +44,7 @@ fn main() {
     let args = Cli::parse();
     match args.command {
         Commands::Watch { config_path } => {
-            println!("Not implemented yet for '{}'", config_path);
+            watch(&config_path);
         }
         Commands::OneOff { config_path } => {
             one_off(&config_path);
@@ -48,19 +52,75 @@ fn main() {
     }
 }
 
-fn one_off(config_path: &String) {
-    let conf = match config::Config::new(config_path) {
+fn get_config(config_path: &String) -> config::Config {
+    match config::Config::new(config_path) {
         Ok(c) => c,
         Err(e) => {
             eprintln!("{}", e);
             std::process::exit(exitcode::CONFIG);
         }
-    };
+    }
+}
+
+fn watch(config_path: &String) {
+    let conf = get_config(config_path);
+
+    let mut paths: HashSet<String> = HashSet::new();
+    // let mut libraries = Vec::new();
+    for cur_lib_config in conf.libraries {
+        for cur_dir in cur_lib_config.1.filter.directories {
+            paths.insert(cur_dir);
+        }
+    }
+
+    let (on_event_sender, on_event_receiver) = channel();
+    let (mut notify_obj, _) =
+        fs_notify::Notify::new(&conf.fs_watch, &paths, on_event_sender).unwrap();
+    let config_path_clone = config_path.clone();
+    thread::spawn(move || loop {
+        let path = match on_event_receiver.recv() {
+            Ok(p) => p,
+            Err(e) => {
+                eprintln!("{}", e);
+                continue;
+            }
+        };
+
+        let conf = get_config(&config_path_clone);
+        for cur_lib_config in conf.libraries {
+            let cur_lib = library::Library::new(&cur_lib_config.1);
+            if !cur_lib.contains_path(Path::new(&path)) {
+                continue;
+            }
+
+            let number = match cur_lib.process(Some(Path::new(&path))) {
+                Ok(n) => n,
+                Err(e) => {
+                    eprintln!("{}", e);
+                    0
+                }
+            };
+
+            if number > 0 {
+                println!(
+                    "Processed '{}' as part of the {} library",
+                    path, cur_lib_config.0
+                );
+            }
+        }
+    });
+
+    one_off(config_path);
+    notify_obj.watch();
+}
+
+fn one_off(config_path: &String) {
+    let conf = get_config(config_path);
 
     for cur_conf in conf.libraries {
         GLOBAL_THREAD_COUNT.fetch_add(1, Ordering::SeqCst);
         thread::spawn(move || {
-            match library::Library::new(cur_conf.1).process() {
+            match library::Library::new(&cur_conf.1).process(None) {
                 Ok(k) => {
                     println!("Processed {} files in the {} library", k, cur_conf.0);
                 }
