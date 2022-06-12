@@ -10,6 +10,13 @@ mod tests;
 #[allow(dead_code)]
 pub struct Config {
     pub libraries: HashMap<String, Libraries>,
+    pub fs_watch: Option<FsWatch>,
+}
+
+#[derive(Debug, Deserialize)]
+#[allow(dead_code)]
+pub struct FsWatch {
+    pub notification_ttl: Option<u64>,
 }
 
 #[derive(Debug, Deserialize)]

@@ -1,3 +1,4 @@
+export RUST_BACKTRACE ?= 1
 dependencies:
 	rustup component add clippy
 	rustup component add rustfmt
@@ -20,5 +21,5 @@ coverage: dependencies
 fmt: dependencies
 	cargo fmt
 
-build: test
+build: clean test
 	cargo build

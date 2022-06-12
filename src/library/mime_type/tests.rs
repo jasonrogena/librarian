@@ -1,71 +1,60 @@
 use super::*;
 use std::env;
+use std::path::Path;
 
 #[test]
 fn test_is_of_type() {
     let mut ok_test_cases = vec![
-        (File::new("tests/files/image/bmp".to_string()), "image/bmp"),
+        (File::new(Path::new("tests/files/image/bmp")), "image/bmp"),
+        (File::new(Path::new("tests/files/audio/flac")), "audio/flac"),
+        (File::new(Path::new("tests/files/image/gif")), "image/gif"),
+        (File::new(Path::new("tests/files/video/mpeg")), "audio/mpeg"),
         (
-            File::new("tests/files/audio/flac".to_string()),
-            "audio/flac",
-        ),
-        (File::new("tests/files/image/gif".to_string()), "image/gif"),
-        (
-            File::new("tests/files/video/mpeg".to_string()),
-            "audio/mpeg",
-        ),
-        (
-            File::new("tests/files/text/pdf".to_string()),
+            File::new(Path::new("tests/files/text/pdf")),
             "application/pdf",
         ),
+        (File::new(Path::new("tests/files/text/plain")), "text/plain"),
+        (File::new(Path::new("tests/files/image/png")), "image/png"),
+        (File::new(Path::new("tests/files/image/tiff")), "image/tiff"),
         (
-            File::new("tests/files/text/plain".to_string()),
-            "text/plain",
-        ),
-        (File::new("tests/files/image/png".to_string()), "image/png"),
-        (
-            File::new("tests/files/image/tiff".to_string()),
-            "image/tiff",
-        ),
-        (
-            File::new("tests/files/audio/wav".to_string()),
+            File::new(Path::new("tests/files/audio/wav")),
             "application/x-riff",
         ),
         (
-            File::new("tests/files/archive/x-7z-compressed".to_string()),
+            File::new(Path::new("tests/files/archive/x-7z-compressed")),
             "application/x-7z-compressed",
         ),
         (
-            File::new("tests/files/image/x-pcx".to_string()),
+            File::new(Path::new("tests/files/image/x-pcx")),
             "image/vnd.zbrush.pcx",
         ),
         (
-            File::new("tests/files/image/x-portable-bitmap".to_string()),
+            File::new(Path::new("tests/files/image/x-portable-bitmap")),
             "image/x-portable-bitmap",
         ),
         (
-            File::new("tests/files/archive/x-tar".to_string()),
+            File::new(Path::new("tests/files/archive/x-tar")),
             "application/x-tar",
         ),
         (
-            File::new("tests/files/image/x-tga".to_string()),
+            File::new(Path::new("tests/files/image/x-tga")),
             "image/x-tga",
         ),
         (
-            File::new("tests/files/archive/zip".to_string()),
+            File::new(Path::new("tests/files/archive/zip")),
             "application/zip",
         ),
     ];
     if env::consts::OS == "linux" {
-        ok_test_cases.push((File::new("tests/files/audio/ogg".to_string()), "video/ogg"));
-        ok_test_cases.push((File::new("tests/files/audio/opus".to_string()), "video/ogg"));
+        ok_test_cases.push((File::new(Path::new("tests/files/audio/ogg")), "video/ogg"));
+        ok_test_cases.push((File::new(Path::new("tests/files/audio/opus")), "video/ogg"));
     } else {
         ok_test_cases.push((
-            File::new("tests/files/audio/ogg".to_string()),
+            File::new(Path::new("tests/files/audio/ogg")),
             "audio/x-vorbis+ogg",
         ));
         ok_test_cases.push((
-            File::new("tests/files/audio/opus".to_string()),
+            File::new(Path::new("tests/files/audio/opus")),
             "audio/x-opus+ogg",
         ));
     }
@@ -74,7 +63,7 @@ fn test_is_of_type() {
     }
 
     let err_test_cases = [(
-        File::new("tests/files/unavialabile_file".to_string()),
+        File::new(Path::new("tests/files/unavialabile_file")),
         "Unable to open file",
     )];
     for cur_case in err_test_cases.iter() {

@@ -1,5 +1,6 @@
 use crate::error;
 use std::io::Read;
+use std::path::Path;
 
 #[cfg(test)]
 mod tests;
@@ -9,23 +10,23 @@ mod tests;
 const MAX_FILE_READ_BYTES: u64 = 10240;
 
 #[derive(Debug)]
-pub struct File {
-    path: String,
+pub struct File<'a> {
+    path: &'a Path,
 }
 
-impl File {
+impl<'a> File<'a> {
     #[allow(dead_code)]
-    pub fn new(path: String) -> File {
+    pub fn new(path: &'a Path) -> File {
         File { path }
     }
 
     #[allow(dead_code)]
-    pub fn get_mime_type(&self) -> Result<String, error::Error> {
-        let mut file_obj = match std::fs::File::open(self.path.clone()) {
+    pub fn get_mime_type(&'a self) -> Result<String, error::Error> {
+        let mut file_obj = match std::fs::File::open(self.path) {
             Ok(f) => f,
             Err(e) => {
                 return Err(error::Error::new(format!(
-                    "Unable to open file '{}' to test its type: {}",
+                    "Unable to open file '{:?}' to test its type: {}",
                     self.path, e
                 )))
             }
@@ -38,7 +39,7 @@ impl File {
             .read_to_end(&mut buf)
         {
             return Err(error::Error::new(format!(
-                "Unable to read file '{}' to test its type: {}",
+                "Unable to read file '{:?}' to test its type: {}",
                 self.path, e
             )));
         }
