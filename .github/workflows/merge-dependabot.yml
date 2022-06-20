@@ -1,12 +1,10 @@
 ---
 name: Auto-merge Dependabot PRs
-# yamllint disable-line rule:truthy
 on:
   schedule:
     - cron: "0 * * * *"
 jobs:
   auto_merge:
-    # yamllint disable-line rule:line-length
     if: (github.event_name == 'schedule' && github.repository == 'starship/starship') || (github.event_name != 'schedule')
     name: Auto-merge Dependabot PRs
     runs-on: ubuntu-latest

@@ -3,3 +3,5 @@ extends: default
 
 rules:
   new-lines: disable
+  line-length: disable
+  truthy: disable
