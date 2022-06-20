@@ -1,4 +1,6 @@
 export RUST_BACKTRACE ?= 1
+export CARGO_BUILD_ARGS ?= --verbose --release
+
 dependencies:
 	rustup component add clippy
 	rustup component add rustfmt
@@ -22,4 +24,4 @@ fmt: dependencies
 	cargo fmt
 
 build: clean test
-	cargo build
+	cargo build ${CARGO_BUILD_ARGS}
