@@ -34,7 +34,7 @@ enum Commands {
 
     /// Run Librarian once
     #[clap(arg_required_else_help = true)]
-    OneOff {
+    SingleShot {
         /// Path to the configuration file to use
         config_path: String,
     },
@@ -46,8 +46,8 @@ fn main() {
         Commands::Watch { config_path } => {
             watch(&config_path);
         }
-        Commands::OneOff { config_path } => {
-            one_off(&config_path);
+        Commands::SingleShot { config_path } => {
+            single_shot(&config_path);
         }
     }
 }
@@ -110,11 +110,11 @@ fn watch(config_path: &String) {
         }
     });
 
-    one_off(config_path);
+    single_shot(config_path);
     notify_obj.watch();
 }
 
-fn one_off(config_path: &String) {
+fn single_shot(config_path: &String) {
     let conf = get_config(config_path);
 
     for cur_conf in conf.libraries {
