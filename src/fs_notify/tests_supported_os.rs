@@ -73,7 +73,7 @@ fn test_notify_ttl() {
     let (on_event_sender, on_event_receiver) = channel();
     let (mut notify_obj, unwatch_sender) = Notify::new(
         &Some(FsWatch {
-            notification_ttl: Some(60),
+            min_command_exec_freq: Some(60),
         }),
         &paths,
         on_event_sender,

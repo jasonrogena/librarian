@@ -25,4 +25,4 @@ echo "{{ file_path }} is a book. The file's MIME type is {{ mime_type }}"  > tes
   directories = [ "tests/files/text" ]
 
 [fs_watch]
-notification_ttl = 60
+min_command_exec_freq = 60

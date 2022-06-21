@@ -7,4 +7,4 @@ echo "{file_path} is a show episode. The file's MIME type is {mime_type}"
   mime_type_regexes = [ "video\\/.+" ]
 
 [fs_watch]
-notification_ttl = 10
+min_command_exec_freq = 10

@@ -77,12 +77,12 @@ impl<'a> Notify<'a> {
             None => return true,
         };
 
-        let notification_ttl = match config.notification_ttl {
+        let min_command_exec_freq = match config.min_command_exec_freq {
             Some(n) => n,
             None => return true,
         };
 
-        if notification_ttl == 0 {
+        if min_command_exec_freq == 0 {
             return true;
         }
 
@@ -95,13 +95,16 @@ impl<'a> Notify<'a> {
             None => return,
         };
 
-        let notification_ttl = match config.notification_ttl {
+        let min_command_exec_freq = match config.min_command_exec_freq {
             Some(n) => n,
             None => return,
         };
 
-        self.notify_ttl
-            .insert(path.to_string(), (), Duration::from_secs(notification_ttl));
+        self.notify_ttl.insert(
+            path.to_string(),
+            (),
+            Duration::from_secs(min_command_exec_freq),
+        );
     }
 
     #[allow(dead_code)]

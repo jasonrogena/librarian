@@ -16,7 +16,7 @@ pub struct Config {
 #[derive(Debug, Deserialize)]
 #[allow(dead_code)]
 pub struct FsWatch {
-    pub notification_ttl: Option<u64>,
+    pub min_command_exec_freq: Option<u64>,
 }
 
 #[derive(Debug, Deserialize)]
