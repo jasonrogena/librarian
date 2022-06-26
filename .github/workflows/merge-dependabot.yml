@@ -10,6 +10,6 @@ jobs:
     steps:
       - uses: akheron/dependabot-cron-action@v1
         with:
-          token: ${{ secrets.DEPENDABOT_GITHUB_API_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           auto-merge: "minor"
           merge-method: "squash"
