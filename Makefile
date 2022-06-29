@@ -23,5 +23,5 @@ coverage: dependencies
 fmt: dependencies
 	cargo fmt
 
-build: clean test
+build: dependencies clean
 	cargo build ${CARGO_BUILD_ARGS}

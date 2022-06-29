@@ -102,7 +102,7 @@ jobs:
       - name: Run tests
         env:
           CARGO_BUILD_ARGS: --verbose --release --target ${{ matrix.target }} --target-dir ${{ env.TARGET_DIR }}
-        run: make build
+        run: make clean build
       - name: Strip release binary (linux and macos)
         if: matrix.build == 'linux' || matrix.build == 'macos-aarch64' || matrix.build == 'macos-x86_64'
         run: strip "target/${{ matrix.target }}/release/librarian"
