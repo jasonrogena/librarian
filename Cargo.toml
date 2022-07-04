@@ -8,7 +8,7 @@ rust-version = "1.61"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-serde = "1.0.137"
+serde = "1.0.138"
 serde_derive = "1.0.138"
 toml = "0.5.9"
 regex = "1"
