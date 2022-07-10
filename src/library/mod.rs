@@ -1,5 +1,6 @@
 use crate::config;
 use crate::error;
+use crate::mime_type;
 use crate::template;
 use std::collections;
 use std::env;
@@ -7,7 +8,6 @@ use std::fs;
 use std::path::Path;
 use std::process::Command;
 
-mod mime_type;
 #[cfg(test)]
 mod tests;
 

@@ -2,8 +2,9 @@ mod config;
 mod error;
 mod fs_notify;
 mod library;
+mod mime_type;
 mod template;
-use clap::{Parser, Subcommand};
+use clap::{Args, Parser, Subcommand};
 use std::collections::HashSet;
 use std::path::Path;
 use std::sync::atomic::{AtomicUsize, Ordering};
@@ -38,6 +39,25 @@ enum Commands {
         /// Path to the configuration file to use
         config_path: String,
     },
+
+    /// Debugging tools to help you to better work with Librarian
+    Test(Test),
+}
+
+#[derive(Debug, Args)]
+#[clap(args_conflicts_with_subcommands = true)]
+struct Test {
+    #[clap(subcommand)]
+    command: TestCommands,
+}
+
+#[derive(Debug, Subcommand)]
+enum TestCommands {
+    /// Check a file's MIME type
+    Mime {
+        #[clap(value_parser)]
+        file_path: String,
+    },
 }
 
 fn main() {
@@ -48,6 +68,9 @@ fn main() {
         }
         Commands::SingleShot { config_path } => {
             single_shot(&config_path);
+        }
+        Commands::Test(t) => {
+            test(&t);
         }
     }
 }
@@ -141,4 +164,22 @@ fn single_shot(config_path: &String) {
     if GLOBAL_FAILED_TREADS.load(Ordering::SeqCst) > 0 {
         std::process::exit(exitcode::DATAERR);
     }
+}
+
+fn test(test: &Test) {
+    match &test.command {
+        TestCommands::Mime { file_path } => mime(file_path),
+    }
+}
+
+fn mime(file_path: &str) {
+    match mime_type::File::new(Path::new(file_path)).get_mime_type() {
+        Err(e) => {
+            eprintln!("{}", e);
+            std::process::exit(exitcode::DATAERR);
+        }
+        Ok(m) => {
+            println!("{}", m)
+        }
+    };
 }
