@@ -1,6 +1,6 @@
 [package]
 name = "fs-librarian"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["Jason Rogena <jason@rogena.me>"]
 edition = "2021"
 rust-version = "1.61"
