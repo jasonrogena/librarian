@@ -15,9 +15,9 @@ use std::time::Duration;
 static GLOBAL_THREAD_COUNT: AtomicUsize = AtomicUsize::new(0);
 static GLOBAL_FAILED_TREADS: AtomicUsize = AtomicUsize::new(0);
 
-/// Goes through files inside directories and does with them as you wish
+/// Runs pre-configured commands against a group of files that match a set of filters
 #[derive(Debug, Parser)]
-#[clap(name = "librarian")]
+#[clap(name = "fs-librarian")]
 #[clap(about = "Goes through file types inside directories and does with them as you wish", long_about = None)]
 struct Cli {
     #[clap(subcommand)]

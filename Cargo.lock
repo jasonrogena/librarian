@@ -232,6 +232,22 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3f9eec918d3f24069decb9af1554cad7c880e2da24a9afd88aca000531ab82c1"
 
 [[package]]
+name = "fs-librarian"
+version = "0.1.0"
+dependencies = [
+ "clap",
+ "exitcode",
+ "notify",
+ "regex",
+ "serde",
+ "serde_derive",
+ "tera",
+ "toml",
+ "tree_magic",
+ "ttl_cache",
+]
+
+[[package]]
 name = "fsevent"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -427,22 +443,6 @@ name = "libc"
 version = "0.2.126"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "349d5a591cd28b49e1d1037471617a32ddcda5731b99419008085f72d5a53836"
-
-[[package]]
-name = "librarian"
-version = "0.1.0"
-dependencies = [
- "clap",
- "exitcode",
- "notify",
- "regex",
- "serde",
- "serde_derive",
- "tera",
- "toml",
- "tree_magic",
- "ttl_cache",
-]
 
 [[package]]
 name = "linked-hash-map"

@@ -1,9 +1,17 @@
 [package]
-name = "librarian"
+name = "fs-librarian"
 version = "0.1.0"
 authors = ["Jason Rogena <jason@rogena.me>"]
 edition = "2021"
 rust-version = "1.61"
+readme = "README.md"
+license-file = "LICENSE"
+documentation = "https://github.com/jasonrogena/librarian/blob/main/README.md"
+description = "Librarian runs pre-configured commands against a group of files that match a set of filters"
+homepage = "https://github.com/jasonrogena/librarian"
+repository = "https://github.com/jasonrogena/librarian"
+keywords = ["directory", "file", "file-manager", "organiser", "organizer"]
+categories = ["command-line-utilities", "filesystem"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
