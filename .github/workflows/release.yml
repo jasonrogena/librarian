@@ -131,8 +131,8 @@ jobs:
           asset_name: ${{ env.ASSET }}
           asset_content_type: application/octet-stream
 
-  pubish-crates-io:
-    name: pubish-crates-io
+  publish-crates-io:
+    name: publish-crates-io
     runs-on: ubuntu-latest
     needs: ['create-release']
     steps:
