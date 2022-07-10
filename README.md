@@ -40,7 +40,7 @@ In the Librarian configuration file, define one or more "libraries" of files. A 
 For each of the defined libraries, provide a [Tera template](https://tera.netlify.app/docs/#templates) (whose syntax is based on Jinja2) of the command that should run when a file is found. The following variables are available to the template:
 
 - `{{ file_path }}`: The path to the file that was found
-- `{{ mime_type }}`: The MIME type for the file that was found
+- `{{ mime_type }}`: The MIME type for the file that was found. Run the `librarian test mime <path to a file>` command to display the MIME types of files you are unsure about.
 
 The following configuration snippet defines a music library which watches for files inside the Downloads and /tmp directories that have MIME types matching the `audio/.+` regex (e.g. `audio/flac` and `audio/ogg`). When an audio file is found, it is moved to the Music directory:
 
