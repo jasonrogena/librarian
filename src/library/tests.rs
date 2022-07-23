@@ -51,7 +51,8 @@ fn test_process() {
         if !test_cases.contains_key(&cur_lib_key) {
             continue;
         }
-        let lib = Library::new(&cur_lib_val);
+        let skip_running_commands = false;
+        let lib = Library::new(&cur_lib_val, &skip_running_commands);
         assert_eq!(
             lib.process(None).unwrap(),
             test_cases.get(&cur_lib_key).unwrap().0.len() as u64
@@ -109,11 +110,12 @@ fn test_process_single_file() {
         );
     }
 
+    let skip_running_commands = false;
     for (cur_lib_key, cur_lib_val) in conf.unwrap().libraries {
         if !test_cases.contains_key(&cur_lib_key) {
             continue;
         }
-        let lib = Library::new(&cur_lib_val);
+        let lib = Library::new(&cur_lib_val, &skip_running_commands);
 
         for cur_file in test_cases.get(&cur_lib_key).unwrap().0.iter() {
             let cur_test_path = Path::new(cur_file.0.as_str());
@@ -134,7 +136,8 @@ fn test_contains_path() {
         config::Config::new(&"tests/configs/good.toml".to_string()).unwrap()
     };
     let cur_dir = current_dir().unwrap();
-    let audio_lib = Library::new(&conf.libraries["audio"]);
+    let skip_running_commands = false;
+    let audio_lib = Library::new(&conf.libraries["audio"], &skip_running_commands);
     assert!(!audio_lib.contains_path(Path::new("")));
     if OS == "windows" {
         assert!(audio_lib.contains_path(Path::new("tests\\files\\audio\\flac")));

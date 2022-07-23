@@ -17,12 +17,16 @@ const TEMPLATE_VAR_MIME_TYPE: &str = "mime_type";
 #[derive(Debug)]
 pub struct Library<'a> {
     config: &'a config::Libraries,
+    skip_running_commands: &'a bool,
 }
 
 impl<'a> Library<'a> {
     #[allow(dead_code)]
-    pub fn new(config: &config::Libraries) -> Library {
-        Library { config }
+    pub fn new(config: &'a config::Libraries, skip_running_commands: &'a bool) -> Library<'a> {
+        Library {
+            config,
+            skip_running_commands,
+        }
     }
 
     #[allow(dead_code)]
@@ -127,6 +131,25 @@ impl<'a> Library<'a> {
         }
 
         // run the command if mime_type passes
+        self.run_command(path, mime_type.as_str())
+    }
+
+    fn run_command(&self, path: &Path, mime_type: &str) -> Result<bool, error::Error> {
+        if *self.skip_running_commands {
+            match path.as_os_str().to_str() {
+                None => {
+                    return Err(error::Error::new(format!(
+                        "Could not extract string from path {:?}",
+                        path
+                    )));
+                }
+                Some(s) => {
+                    println!("{}", s);
+                    return Ok(true);
+                }
+            }
+        }
+
         let path_str = match path.as_os_str().to_str() {
             None => {
                 return Err(error::Error::new(format!(
@@ -138,7 +161,7 @@ impl<'a> Library<'a> {
         };
         let mut data = collections::HashMap::new();
         data.insert(TEMPLATE_VAR_FILE_PATH, path_str);
-        data.insert(TEMPLATE_VAR_MIME_TYPE, mime_type.as_str());
+        data.insert(TEMPLATE_VAR_MIME_TYPE, mime_type);
 
         let tmplt = template::Template::new(self.config.command.clone())?;
         let cmd_str = tmplt.render(&data)?;

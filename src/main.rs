@@ -18,7 +18,7 @@ static GLOBAL_FAILED_TREADS: AtomicUsize = AtomicUsize::new(0);
 /// Runs pre-configured commands against a group of files that match a set of filters
 #[derive(Debug, Parser)]
 #[clap(name = "fs-librarian")]
-#[clap(about = "Goes through file types inside directories and does with them as you wish", long_about = None)]
+#[clap(author, version, about = "Goes through file types inside directories and does with them as you wish", long_about = None)]
 struct Cli {
     #[clap(subcommand)]
     command: Commands,
@@ -30,14 +30,22 @@ enum Commands {
     #[clap(arg_required_else_help = true)]
     Watch {
         /// Path to the configuration file to use
+        #[clap(required = true)]
         config_path: String,
+        /// Print the file Librarian got a notification for, instead of running the pre-configured command against it
+        #[clap(short, long)]
+        dry_run: bool,
     },
 
     /// Run Librarian once
     #[clap(arg_required_else_help = true)]
     SingleShot {
         /// Path to the configuration file to use
+        #[clap(required = true)]
         config_path: String,
+        /// Print the filtered files, instead of running the pre-configured commands against them
+        #[clap(short, long)]
+        dry_run: bool,
     },
 
     /// Debugging tools to help you to better work with Librarian
@@ -63,11 +71,17 @@ enum TestCommands {
 fn main() {
     let args = Cli::parse();
     match args.command {
-        Commands::Watch { config_path } => {
-            watch(&config_path);
+        Commands::Watch {
+            config_path,
+            dry_run,
+        } => {
+            watch(&config_path, dry_run);
         }
-        Commands::SingleShot { config_path } => {
-            single_shot(&config_path);
+        Commands::SingleShot {
+            config_path,
+            dry_run,
+        } => {
+            single_shot(&config_path, dry_run);
         }
         Commands::Test(t) => {
             test(&t);
@@ -85,7 +99,7 @@ fn get_config(config_path: &String) -> config::Config {
     }
 }
 
-fn watch(config_path: &String) {
+fn watch(config_path: &String, dry_run: bool) {
     let conf = get_config(config_path);
 
     let mut paths: HashSet<String> = HashSet::new();
@@ -111,7 +125,7 @@ fn watch(config_path: &String) {
 
         let conf = get_config(&config_path_clone);
         for cur_lib_config in conf.libraries {
-            let cur_lib = library::Library::new(&cur_lib_config.1);
+            let cur_lib = library::Library::new(&cur_lib_config.1, &dry_run);
             if !cur_lib.contains_path(Path::new(&path)) {
                 continue;
             }
@@ -133,17 +147,17 @@ fn watch(config_path: &String) {
         }
     });
 
-    single_shot(config_path);
+    single_shot(config_path, dry_run);
     notify_obj.watch();
 }
 
-fn single_shot(config_path: &String) {
+fn single_shot(config_path: &String, dry_run: bool) {
     let conf = get_config(config_path);
 
     for cur_conf in conf.libraries {
         GLOBAL_THREAD_COUNT.fetch_add(1, Ordering::SeqCst);
         thread::spawn(move || {
-            match library::Library::new(&cur_conf.1).process(None) {
+            match library::Library::new(&cur_conf.1, &dry_run).process(None) {
                 Ok(k) => {
                     println!("Processed {} files in the {} library", k, cur_conf.0);
                 }
