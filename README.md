@@ -1,6 +1,7 @@
 ## Filesystem Librarian
 
-[![Build Status](https://github.com/jasonrogena/librarian/workflows/CI/badge.svg)](https://github.com/jasonrogena/librarian/actions?query=workflow%3ACI)[![codecov](https://codecov.io/gh/jasonrogena/librarian/branch/main/graph/badge.svg?token=O3PNGORLW8)](https://codecov.io/gh/jasonrogena/librarian)
+[![Build Status](https://github.com/jasonrogena/librarian/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/jasonrogena/librarian/actions/workflows/ci.yml?query=branch%3Amain+workflow%3ACI)
+[![codecov](https://codecov.io/gh/jasonrogena/librarian/branch/main/graph/badge.svg?token=O3PNGORLW8)](https://codecov.io/gh/jasonrogena/librarian)
 
 Librarian runs pre-configured commands against a group of files that match a set of filters. The group of files is called a library. Librarian can either search for files in a library or watch for when files in the library are created or updated.
 
