@@ -14,31 +14,18 @@ fn test_process() {
         config::Config::new(&"tests/configs/good.toml".to_string())
     };
     let mut test_cases: HashMap<String, (Vec<String>, String)> = HashMap::new();
-    if OS == "linux" {
-        test_cases.insert(
-            "audio".to_string(),
-            (
-                vec![
-                    "audio_tests_files_audio_flac".to_string(),
-                    "audio_tests_files_video_mpeg".to_string(),
-                ],
-                "is an audio file. The file's MIME type is".to_string(),
-            ),
-        );
-    } else {
-        test_cases.insert(
-            "audio".to_string(),
-            (
-                vec![
-                    "audio_tests_files_audio_flac".to_string(),
-                    "audio_tests_files_audio_ogg".to_string(),
-                    "audio_tests_files_audio_opus".to_string(),
-                    "audio_tests_files_video_mpeg".to_string(),
-                ],
-                "is an audio file. The file's MIME type is".to_string(),
-            ),
-        );
-    }
+    test_cases.insert(
+        "audio".to_string(),
+        (
+            vec![
+                "audio_tests_files_audio_flac".to_string(),
+                "audio_tests_files_audio_ogg".to_string(),
+                "audio_tests_files_audio_opus".to_string(),
+                "audio_tests_files_video_mpeg".to_string(),
+            ],
+            "is an audio file. The file's MIME type is".to_string(),
+        ),
+    );
     test_cases.insert(
         "videos".to_string(),
         (

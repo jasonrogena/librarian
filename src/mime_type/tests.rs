@@ -1,10 +1,9 @@
 use super::*;
-use std::env;
 use std::path::Path;
 
 #[test]
 fn test_is_of_type() {
-    let mut ok_test_cases = vec![
+    let ok_test_cases = vec![
         (File::new(Path::new("tests/files/image/bmp")), "image/bmp"),
         (File::new(Path::new("tests/files/audio/flac")), "audio/flac"),
         (File::new(Path::new("tests/files/image/gif")), "image/gif"),
@@ -44,20 +43,15 @@ fn test_is_of_type() {
             File::new(Path::new("tests/files/archive/zip")),
             "application/zip",
         ),
-    ];
-    if env::consts::OS == "linux" {
-        ok_test_cases.push((File::new(Path::new("tests/files/audio/ogg")), "video/ogg"));
-        ok_test_cases.push((File::new(Path::new("tests/files/audio/opus")), "video/ogg"));
-    } else {
-        ok_test_cases.push((
+        (
             File::new(Path::new("tests/files/audio/ogg")),
             "audio/x-vorbis+ogg",
-        ));
-        ok_test_cases.push((
+        ),
+        (
             File::new(Path::new("tests/files/audio/opus")),
             "audio/x-opus+ogg",
-        ));
-    }
+        ),
+    ];
     for cur_case in ok_test_cases.iter() {
         assert_eq!(cur_case.0.get_mime_type().unwrap(), cur_case.1);
     }
