@@ -155,4 +155,4 @@ jobs:
         with:
           name: "fs-librarian"
           tap_repo: "jasonrogena/homebrew-librarian"
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.BREW_TAP_GITHUB_TOKEN }}
