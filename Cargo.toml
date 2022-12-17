@@ -21,9 +21,9 @@ exclude = [
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-serde = "1.0.148"
-serde_derive = "1.0.148"
-toml = "0.5.9"
+serde = "1.0.150"
+serde_derive = "1.0.150"
+toml = "0.5.10"
 regex = "1"
 tree_magic = "0.2.3"
 tera = "1"
