@@ -17,9 +17,20 @@ To make Librarian continually watch for when files in configured libraries are c
 fs-librarian watch path/to/config.toml
 ```
 
+### Installation
+
+You can use the pre-built binaries on the [release page](./releases). They run as standalone binaries and don't require any prerequisite software installed on your machine.
+
+On macOS, you can use Homebrew to install and update Librarian:
+
+```sh
+brew tap jasonrogena/librarian
+brew install fs-librarian
+```
+
 ### Building
 
-You can use the pre-built binaries on the [release page](./releases) or build Librarian on your own. To build Librarian, make sure you have Rust installed on your machine (installation instructions are [here](https://www.rust-lang.org/tools/install)) then run:
+To build Librarian, make sure you have rustup installed on your machine (installation instructions are [here](https://www.rust-lang.org/tools/install)) then run:
 
 ```sh
 make clean build

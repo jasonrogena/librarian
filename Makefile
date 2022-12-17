@@ -2,6 +2,7 @@ export RUST_BACKTRACE ?= 1
 export CARGO_BUILD_ARGS ?= --verbose --release
 
 dependencies:
+	rustup component add cargo
 	rustup component add clippy
 	rustup component add rustfmt
 	rustup component add llvm-tools-preview
