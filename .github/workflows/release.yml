@@ -153,7 +153,7 @@ jobs:
       - uses: mislav/bump-homebrew-formula-action@v2
         with:
           formula-name: fs-librarian
-          homebrew-tap: jasonrogena/librarian
+          homebrew-tap: jasonrogena/homebrew-librarian
           base-branch: main
           download-url: https://github.com/jasonrogena/librarian.git
         env:
