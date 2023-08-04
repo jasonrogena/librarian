@@ -23,7 +23,7 @@ exclude = [
 [dependencies]
 serde = "1.0.181"
 serde_derive = "1.0.181"
-toml = "0.5.11"
+toml = "0.7.6"
 regex = "1"
 tree_magic = "0.2.3"
 tera = "1"
