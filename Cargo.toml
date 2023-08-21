@@ -29,5 +29,5 @@ tree_magic = "0.2.3"
 tera = "1"
 clap = { version = "4.3", features = ["derive"] }
 exitcode = "1.1.2"
-notify = "4.0.16"
+notify = "6.1.0"
 ttl_cache = "0.5.1"
