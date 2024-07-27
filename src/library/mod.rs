@@ -1,5 +1,4 @@
 use crate::config;
-use crate::error;
 use crate::mime_type;
 use crate::template;
 use std::collections;
@@ -13,6 +12,22 @@ mod tests;
 
 const TEMPLATE_VAR_FILE_PATH: &str = "file_path";
 const TEMPLATE_VAR_MIME_TYPE: &str = "mime_type";
+
+#[derive(Debug, thiserror::Error)]
+pub enum Error {
+    #[error("A config error was thrown")]
+    Config(#[from] config::Error),
+    #[error("A MIME type error was thrown")]
+    Mime(#[from] mime_type::Error),
+    #[error("A templating error was thrown")]
+    Template(#[from] template::Error),
+    #[error("An IO error was thrown")]
+    Io(#[from] std::io::Error),
+    #[error("A regex error was thrown")]
+    Regex(#[from] regex::Error),
+    #[error("Could not read path {0}")]
+    ReadPath(Box<Path>),
+}
 
 #[derive(Debug)]
 pub struct Library<'a> {
@@ -30,7 +45,7 @@ impl<'a> Library<'a> {
     }
 
     #[allow(dead_code)]
-    pub fn process(&self, path: Option<&Path>) -> Result<u64, error::Error> {
+    pub fn process(&self, path: Option<&Path>) -> Result<u64, Error> {
         let mut num_processed_files: u64 = 0;
 
         if let Some(p) = path {
@@ -52,41 +67,15 @@ impl<'a> Library<'a> {
         Ok(num_processed_files)
     }
 
-    fn process_dir(&self, dir: &Path) -> Result<u64, error::Error> {
+    fn process_dir(&self, dir: &Path) -> Result<u64, Error> {
         let mut num_processed_files: u64 = 0;
         // iteratively go through all files in directory
-        let paths = match fs::read_dir(dir) {
-            Err(e) => {
-                return Err(error::Error::new(format!(
-                    "Unable to read directory contents for '{:?}': {}",
-                    dir, e
-                )))
-            }
-            Ok(p) => p,
-        };
+        let paths = fs::read_dir(dir)?;
 
         for cur_entry_res in paths {
-            let cur_entry = match cur_entry_res {
-                Err(e) => {
-                    return Err(error::Error::new(format!(
-                        "An error occurred reading a directory entry for '{:?}': {}",
-                        dir, e
-                    )))
-                }
-                Ok(de) => de,
-            };
+            let cur_entry = cur_entry_res?;
 
-            let file_type = match cur_entry.file_type() {
-                Err(e) => {
-                    return Err(error::Error::new(format!(
-                        "Could not determine the file_type of {:?}: {}",
-                        cur_entry.path(),
-                        e
-                    )))
-                }
-                Ok(f) => f,
-            };
-
+            let file_type = cur_entry.file_type()?;
             if file_type.is_dir() {
                 num_processed_files += self.process_dir(&cur_entry.path())?;
             } else if self.process_file(&cur_entry.path())? {
@@ -96,7 +85,7 @@ impl<'a> Library<'a> {
         Ok(num_processed_files)
     }
 
-    fn process_file(&self, path: &Path) -> Result<bool, error::Error> {
+    fn process_file(&self, path: &Path) -> Result<bool, Error> {
         let mime_type = match mime_type::File::new(path).get_mime_type() {
             Err(e) => {
                 eprintln!("{}", e);
@@ -109,15 +98,7 @@ impl<'a> Library<'a> {
         if let Some(regexes) = &self.config.filter.mime_type_regexes {
             let mut is_matched = false;
             for cur_regex in regexes.iter() {
-                let re = match regex::Regex::new(cur_regex.as_str()) {
-                    Err(e) => {
-                        return Err(error::Error::new(format!(
-                            "Couldn't parse regex '{}' to use to test the MIME type for '{:?}': {}",
-                            cur_regex, path, e
-                        )))
-                    }
-                    Ok(r) => r,
-                };
+                let re = regex::Regex::new(cur_regex.as_str())?;
 
                 if re.is_match(mime_type.as_str()) {
                     is_matched = true;
@@ -134,14 +115,11 @@ impl<'a> Library<'a> {
         self.run_command(path, mime_type.as_str())
     }
 
-    fn run_command(&self, path: &Path, mime_type: &str) -> Result<bool, error::Error> {
+    fn run_command(&self, path: &Path, mime_type: &str) -> Result<bool, Error> {
         if *self.skip_running_commands {
             match path.as_os_str().to_str() {
                 None => {
-                    return Err(error::Error::new(format!(
-                        "Could not extract string from path {:?}",
-                        path
-                    )));
+                    return Err(Error::ReadPath(path.into()));
                 }
                 Some(s) => {
                     println!("{}", s);
@@ -152,10 +130,7 @@ impl<'a> Library<'a> {
 
         let path_str = match path.as_os_str().to_str() {
             None => {
-                return Err(error::Error::new(format!(
-                    "Could not extract string from path {:?}",
-                    path
-                )))
+                return Err(Error::ReadPath(path.into()));
             }
             Some(s) => s,
         };
@@ -171,13 +146,9 @@ impl<'a> Library<'a> {
         } else {
             Command::new("sh").arg("-c").arg(cmd_str).output()
         };
-        match output {
-            Err(e) => Err(error::Error::new(format!(
-                "Got an error while running command against file '{:?}': {}",
-                path, e
-            ))),
-            Ok(_) => Ok(true),
-        }
+        output?;
+
+        Ok(true)
     }
 
     pub fn contains_path(&self, path: &Path) -> bool {

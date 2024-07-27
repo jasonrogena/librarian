@@ -40,7 +40,7 @@ fn test_watch() {
                 fs::File::create(generate_test_output_filename("watch", p)).unwrap();
             write!(woot_file, "{}", test_str_clone).unwrap();
         }
-        Notify::unwatch(&unwatch_sender);
+        let _ = Notify::unwatch(&unwatch_sender);
         run_tests_sender.send(true).unwrap();
     });
 
@@ -104,7 +104,7 @@ fn test_notify_ttl() {
                 write!(woot_file, "nope").unwrap();
             }
         }
-        Notify::unwatch(&unwatch_sender);
+        let _ = Notify::unwatch(&unwatch_sender);
         run_tests_sender.send(true).unwrap();
     });
 

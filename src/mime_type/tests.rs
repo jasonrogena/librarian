@@ -58,14 +58,14 @@ fn test_is_of_type() {
 
     let err_test_cases = [(
         File::new(Path::new("tests/files/unavialabile_file")),
-        "Unable to open file",
+        "An IO error was thrown while trying to determine the MIME type of a file",
     )];
     for cur_case in err_test_cases.iter() {
         assert!(cur_case
             .0
             .get_mime_type()
             .unwrap_err()
-            .get_message()
+            .to_string()
             .contains(cur_case.1));
     }
 }

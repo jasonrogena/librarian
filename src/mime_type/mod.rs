@@ -1,4 +1,3 @@
-use crate::error;
 use std::io::Read;
 use std::path::Path;
 
@@ -8,6 +7,12 @@ mod tests;
 // the magic number used to determine the file type
 #[allow(dead_code)]
 const MAX_FILE_READ_BYTES: u64 = 10240;
+
+#[derive(Debug, thiserror::Error)]
+pub enum Error {
+    #[error("An IO error was thrown while trying to determine the MIME type of a file")]
+    Io(#[from] std::io::Error),
+}
 
 #[derive(Debug)]
 pub struct File<'a> {
@@ -21,28 +26,14 @@ impl<'a> File<'a> {
     }
 
     #[allow(dead_code)]
-    pub fn get_mime_type(&'a self) -> Result<String, error::Error> {
-        let mut file_obj = match std::fs::File::open(self.path) {
-            Ok(f) => f,
-            Err(e) => {
-                return Err(error::Error::new(format!(
-                    "Unable to open file '{:?}' to test its type: {}",
-                    self.path, e
-                )))
-            }
-        };
+    pub fn get_mime_type(&'a self) -> Result<String, Error> {
+        let mut file_obj = std::fs::File::open(self.path)?;
 
         let mut buf = Vec::with_capacity(MAX_FILE_READ_BYTES as usize);
-        if let Err(e) = file_obj
+        file_obj
             .by_ref()
             .take(MAX_FILE_READ_BYTES)
-            .read_to_end(&mut buf)
-        {
-            return Err(error::Error::new(format!(
-                "Unable to read file '{:?}' to test its type: {}",
-                self.path, e
-            )));
-        }
+            .read_to_end(&mut buf)?;
 
         let mime_type = tree_magic::from_u8(buf.as_slice());
 

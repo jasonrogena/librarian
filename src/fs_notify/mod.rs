@@ -1,5 +1,4 @@
 use crate::config::FsWatch;
-use crate::error::Error;
 use notify::{Op, RawEvent, RecommendedWatcher, RecursiveMode, Watcher};
 use std::collections::HashSet;
 use std::env::consts::OS;
@@ -13,6 +12,16 @@ mod tests_supported_os;
 #[cfg(test)]
 #[cfg(target_family = "windows")]
 mod tests_unsupported_os;
+
+#[derive(Debug, thiserror::Error)]
+pub enum Error {
+    #[error("The feature '{0}' is unsupported")]
+    UnsupportedFeature(String),
+    #[error("An error was thrown by the filesystem notification system")]
+    Notify(#[from] notify::Error),
+    #[error("An error was thrown while trying to interract with the notification system")]
+    Send(#[from] std::sync::mpsc::SendError<bool>),
+}
 
 pub struct Notify<'a> {
     _watcher: RecommendedWatcher,
@@ -31,29 +40,14 @@ impl<'a> Notify<'a> {
         on_event_sender: Sender<String>,
     ) -> Result<(Notify<'a>, Sender<bool>), Error> {
         if OS == "windows" {
-            return Err(Error::new(
-                "Directory watching is currently not supported in this OS".to_string(),
-            ));
+            return Err(Error::UnsupportedFeature("directory watching".to_string()));
         }
 
         let (watcher_sender, watcher_receiver) = channel();
-        let mut watcher: RecommendedWatcher = match Watcher::new_raw(watcher_sender) {
-            Ok(w) => w,
-            Err(e) => {
-                return Err(Error::new(format!(
-                    "Unable to initialize code for notifying on filesystem changes: {:?}",
-                    e
-                )))
-            }
-        };
+        let mut watcher: RecommendedWatcher = Watcher::new_raw(watcher_sender)?;
 
         for cur_path in paths {
-            if let Err(e) = watcher.watch(cur_path, RecursiveMode::Recursive) {
-                return Err(Error::new(format!(
-                    "Could not watch '{}' for changes: {}",
-                    cur_path, e
-                )));
-            }
+            watcher.watch(cur_path, RecursiveMode::Recursive)?;
         }
 
         let (unwatch_sender, unwatch_receiver) = channel();
@@ -143,13 +137,8 @@ impl<'a> Notify<'a> {
     }
 
     #[allow(dead_code)]
-    pub fn unwatch(unwatch_sender: &Sender<bool>) -> Option<Error> {
-        if let Err(e) = unwatch_sender.send(true) {
-            return Some(Error::new(format!(
-                "Could not notify FS watcher to stop: {}",
-                e
-            )));
-        }
-        None
+    pub fn unwatch(unwatch_sender: &Sender<bool>) -> Result<(), Error> {
+        unwatch_sender.send(true)?;
+        Ok(())
     }
 }

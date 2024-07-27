@@ -1,10 +1,18 @@
-use crate::error;
 use serde_derive::Deserialize;
 use std::collections::HashMap;
 use std::fs;
+use std::io;
 
 #[cfg(test)]
 mod tests;
+
+#[derive(Debug, thiserror::Error)]
+pub enum Error {
+    #[error("An io Error was thrown while reading the config")]
+    Io(#[from] io::Error),
+    #[error("An Error was thrown while trying to parse the config as TOML")]
+    Toml(#[from] toml::de::Error),
+}
 
 #[derive(Debug, Deserialize)]
 #[allow(dead_code)]
@@ -35,24 +43,9 @@ pub struct Filter {
 
 impl Config {
     #[allow(dead_code)]
-    pub fn new(config_path: &String) -> std::result::Result<Config, error::Error> {
-        let contents = match fs::read_to_string(config_path) {
-            Ok(c) => c,
-            Err(e) => {
-                return Err(error::Error::new(format!(
-                    "Unable to read config '{}' contents: {}",
-                    config_path, e
-                )))
-            }
-        };
+    pub fn new(config_path: &String) -> std::result::Result<Config, Error> {
+        let contents = fs::read_to_string(config_path)?;
 
-        let result = toml::from_str(&contents);
-        match result {
-            Ok(c) => Ok(c),
-            Err(e) => Err(error::Error::new(format!(
-                "Couldn't parse config '{}' as TOML: {}",
-                config_path, e
-            ))),
-        }
+        Ok(toml::from_str(&contents)?)
     }
 }

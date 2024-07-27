@@ -1,5 +1,4 @@
 mod config;
-mod error;
 mod fs_notify;
 mod library;
 mod mime_type;

@@ -32,7 +32,7 @@ fn test_render() {
     let err_test_cases: Vec<(&str, collections::HashMap<&str, &str>, &str)> = vec![(
         "Test {{ var_1 }} before {{ var_2 }}.",
         [("var_1", "hello")].iter().cloned().collect(),
-        "Variable `var_2` not found in context while rendering",
+        "A Tera templating error occurred",
     )];
 
     for cur_test_case in err_test_cases.iter() {
@@ -40,7 +40,7 @@ fn test_render() {
         assert!(cur_template
             .render(&cur_test_case.1)
             .unwrap_err()
-            .get_message()
+            .to_string()
             .contains(cur_test_case.2));
     }
 }
