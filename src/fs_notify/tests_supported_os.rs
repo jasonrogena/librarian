@@ -25,7 +25,7 @@ fn test_watch() {
     let (mut notify_obj, unwatch_sender) = Notify::new(&None, &paths, on_event_sender).unwrap();
 
     thread::spawn(move || {
-        notify_obj.watch();
+        notify_obj.watch().unwrap();
     });
     let test_str_clone = test_str.to_string();
     let (run_tests_sender, run_tests_receiver) = channel();
@@ -81,7 +81,7 @@ fn test_notify_ttl() {
     .unwrap();
 
     thread::spawn(move || {
-        notify_obj.watch();
+        notify_obj.watch().unwrap();
     });
     let test_str_clone = test_str.to_string();
     let (run_tests_sender, run_tests_receiver) = channel();

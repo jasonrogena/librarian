@@ -29,6 +29,8 @@ tree_magic = "0.2.3"
 tera = "1"
 clap = { version = "4.5", features = ["derive"] }
 exitcode = "1.1.2"
-notify = "4.0.16"
 ttl_cache = "0.5.1"
 thiserror = "1.0.63"
+bitflags = "2.6.0"
+tokio-util = "0.7.10"
+notify = { version = "6.1.1", default-features = false, features = ["macos_kqueue"] }
