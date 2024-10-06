@@ -5,7 +5,8 @@ use std::sync::mpsc::{channel, Receiver, Sender};
 use std::time::Duration;
 use ttl_cache::TtlCache;
 
-mod inotify;
+mod notify_notifier;
+mod fanotify_notifier;
 
 #[cfg(test)]
 #[cfg(target_family = "unix")]
@@ -16,12 +17,14 @@ mod tests_unsupported_os;
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
-    #[error("An error was thrown by the filesystem notification system")]
-    Notify(#[from] notify::Error),
+    #[error("An error was thrown by NotifyNotifier")]
+    NotifyNotifier(#[from] notify_notifier::Error),
+    #[error("An error was thrown by NotifyNotifier")]
+    FanotifyNotifier(#[from] fanotify_notifier::Error),
     #[error("An error was thrown while trying to interract with the notification system")]
     Send(#[from] std::sync::mpsc::SendError<bool>),
-    #[error("An error was returned by the Inotify notification system")]
-    Inotify(#[from] inotify::Error),
+    #[error("The watching feature is unsupported")]
+    FeatureNotSupported(),
 }
 
 pub struct Notify<'a> {
@@ -59,6 +62,7 @@ trait Notifier {
         notification_sender: Sender<Notification>,
     ) -> Result<(), Error>;
     fn stop_watching(&mut self);
+    fn is_supported(&self) -> bool;
 }
 
 impl<'a> Notify<'a> {
@@ -121,8 +125,21 @@ impl<'a> Notify<'a> {
     #[allow(dead_code)]
     pub fn watch(&mut self) -> Result<(), Error> {
         let (notification_sender, notification_receiver) = channel();
-        let mut i = inotify::Inotify::init();
-        i.start_watching(&self.paths, notification_sender)?;
+        let mut watching = false;
+        let mut i = notify_notifier::NotifyNotifier::new();
+        if i.is_supported() {
+            i.start_watching(&self.paths, notification_sender.clone())?;
+            watching = true;
+        }
+        let mut fa = fanotify_notifier::FanotifyNotifier::new();
+        if fa.is_supported() {
+            fa.start_watching(&self.paths, notification_sender)?;
+            watching = true;
+        }
+
+        if !watching {
+            return Err(Error::FeatureNotSupported());
+        }
 
         loop {
             match notification_receiver.recv() {
