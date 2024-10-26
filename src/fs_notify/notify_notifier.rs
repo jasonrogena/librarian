@@ -95,7 +95,7 @@ impl Notifier for NotifyNotifier {
     fn stop_watching(&mut self) {
         self.stop_cancellation_token.cancel();
     }
-    
+
     fn is_supported(&self) -> bool {
         if OS == "windows" {
             return false;

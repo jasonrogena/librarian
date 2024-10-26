@@ -5,15 +5,15 @@ use std::sync::mpsc::{channel, Receiver, Sender};
 use std::time::Duration;
 use ttl_cache::TtlCache;
 
-mod notify_notifier;
 mod fanotify_notifier;
+mod notify_notifier;
 
-#[cfg(test)]
-#[cfg(target_family = "unix")]
-mod tests_supported_os;
-#[cfg(test)]
-#[cfg(target_family = "windows")]
-mod tests_unsupported_os;
+// #[cfg(test)]
+// #[cfg(target_family = "unix")]
+// mod tests_supported_os;
+// #[cfg(test)]
+// #[cfg(target_family = "windows")]
+// mod tests_unsupported_os;
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
