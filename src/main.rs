@@ -5,11 +5,14 @@ mod mime_type;
 mod template;
 use clap::{Args, Parser, Subcommand};
 use std::collections::HashSet;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::mpsc::channel;
 use std::thread;
 use std::time::Duration;
+
+#[macro_use]
+extern crate bitflags;
 
 static GLOBAL_THREAD_COUNT: AtomicUsize = AtomicUsize::new(0);
 static GLOBAL_FAILED_TREADS: AtomicUsize = AtomicUsize::new(0);
@@ -101,17 +104,17 @@ fn get_config(config_path: &String) -> config::Config {
 fn watch(config_path: &String, dry_run: bool) {
     let conf = get_config(config_path);
 
-    let mut paths: HashSet<String> = HashSet::new();
+    let mut paths: HashSet<PathBuf> = HashSet::new();
     // let mut libraries = Vec::new();
     for cur_lib_config in conf.libraries {
         for cur_dir in cur_lib_config.1.filter.directories {
-            paths.insert(cur_dir);
+            paths.insert(PathBuf::from(cur_dir));
         }
     }
 
     let (on_event_sender, on_event_receiver) = channel();
     let (mut notify_obj, _) =
-        fs_notify::Notify::new(&conf.fs_watch, &paths, on_event_sender).unwrap();
+        fs_notify::Notify::new(&conf.fs_watch, paths, on_event_sender).unwrap();
     let config_path_clone = config_path.clone();
     thread::spawn(move || loop {
         let path = match on_event_receiver.recv() {
@@ -147,7 +150,12 @@ fn watch(config_path: &String, dry_run: bool) {
     });
 
     single_shot(config_path, dry_run);
-    notify_obj.watch();
+    if let Err(e) = notify_obj.watch() {
+        eprint!(
+            "An error was thrown while attempting to watch a library: {:?}",
+            e
+        );
+    }
 }
 
 fn single_shot(config_path: &String, dry_run: bool) {

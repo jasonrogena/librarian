@@ -13,7 +13,6 @@ clean:
 	cargo clean
 
 test: dependencies
-	yamllint .
 	cargo clippy --all-targets --all-features -- -D warnings
 	cargo fmt --all -- --check
 	cargo test

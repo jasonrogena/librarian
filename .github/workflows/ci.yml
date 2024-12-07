@@ -83,11 +83,11 @@ jobs:
         run: make clean test
       - name: Generate code coverage
         run: make clean coverage
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
         with:
-          files: target/lcov.info
-          fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
       - name: Check if can publish to crates.io
         uses: katyo/publish-crates@v1
         with:

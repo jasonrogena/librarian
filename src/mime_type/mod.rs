@@ -21,7 +21,7 @@ pub struct File<'a> {
 
 impl<'a> File<'a> {
     #[allow(dead_code)]
-    pub fn new(path: &'a Path) -> File {
+    pub fn new(path: &'a Path) -> File<'a> {
         File { path }
     }
 

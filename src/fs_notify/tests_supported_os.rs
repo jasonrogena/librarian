@@ -18,14 +18,14 @@ fn test_watch() {
     test_sub_dir.push("sub_dir");
     fs::create_dir_all(test_sub_dir.clone()).unwrap();
     let test_str = format!("{:?}", time::SystemTime::now());
-    let mut paths: HashSet<String> = HashSet::new();
-    paths.insert(test_dir.as_os_str().to_str().unwrap().to_string());
-    paths.insert(test_sub_dir.as_os_str().to_str().unwrap().to_string());
+    let mut paths: HashSet<PathBuf> = HashSet::new();
+    paths.insert(test_dir.clone());
+    paths.insert(test_sub_dir.clone());
     let (on_event_sender, on_event_receiver) = channel();
-    let (mut notify_obj, unwatch_sender) = Notify::new(&None, &paths, on_event_sender).unwrap();
+    let (mut notify_obj, unwatch_sender) = Notify::new(&None, paths, on_event_sender).unwrap();
 
     thread::spawn(move || {
-        notify_obj.watch();
+        notify_obj.watch().unwrap();
     });
     let test_str_clone = test_str.to_string();
     let (run_tests_sender, run_tests_receiver) = channel();
@@ -67,21 +67,21 @@ fn test_notify_ttl() {
     test_sub_dir.push("sub_dir");
     fs::create_dir_all(test_sub_dir.clone()).unwrap();
     let test_str = format!("{:?}", time::SystemTime::now());
-    let mut paths: HashSet<String> = HashSet::new();
-    paths.insert(test_dir.as_os_str().to_str().unwrap().to_string());
-    paths.insert(test_sub_dir.as_os_str().to_str().unwrap().to_string());
+    let mut paths: HashSet<PathBuf> = HashSet::new();
+    paths.insert(test_dir.clone());
+    paths.insert(test_sub_dir.clone());
     let (on_event_sender, on_event_receiver) = channel();
     let (mut notify_obj, unwatch_sender) = Notify::new(
         &Some(FsWatch {
             min_command_exec_freq: Some(60),
         }),
-        &paths,
+        paths,
         on_event_sender,
     )
     .unwrap();
 
     thread::spawn(move || {
-        notify_obj.watch();
+        notify_obj.watch().unwrap();
     });
     let test_str_clone = test_str.to_string();
     let (run_tests_sender, run_tests_receiver) = channel();
