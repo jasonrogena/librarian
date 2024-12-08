@@ -116,6 +116,7 @@ impl<'a> Library<'a> {
     }
 
     fn run_command(&self, path: &Path, mime_type: &str) -> Result<bool, Error> {
+        println!("Processing '{}'", path.display());
         if *self.skip_running_commands {
             match path.as_os_str().to_str() {
                 None => {

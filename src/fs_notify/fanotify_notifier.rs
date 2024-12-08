@@ -19,8 +19,8 @@ use {
 pub enum Error {
     #[error("The feature '{0}' is unsupported")]
     UnsupportedFeature(String),
-    //#[error("An error was thrown by the filesystem notification system")]
-    //Faotify(#[from] fanotify::Error),
+    #[error("An error was thrown by the filesystem notification system: {0}")]
+    Faotify(String),
     #[error("An error was thrown while trying to interract with the notification system")]
     Send(#[from] std::sync::mpsc::SendError<bool>),
 }
@@ -57,21 +57,17 @@ impl FanotifyNotifier {
     ) -> Result<(), Error> {
         let stop_cancellation_token = self.stop_cancellation_token.clone();
         let local_paths = paths.clone();
+        let fd = match Fanotify::new_nonblocking(FanotifyMode::NOTIF) {
+            Ok(f) => f,
+            Err(e) => return Err(Error::Faotify(e.to_string())),
+        };
+        for cur_path in local_paths {
+            fd.add_path(
+                FAN_CREATE | FAN_CLOSE_WRITE | FAN_MOVE_SELF | FAN_MODIFY,
+                &cur_path,
+            ).map_err(|err| Error::Faotify(err.to_string()))?;
+        }
         thread::spawn(move || {
-            let fd = match Fanotify::new_nonblocking(FanotifyMode::NOTIF) {
-                Ok(f) => f,
-                Err(e) => panic!(
-                    "An error occurred while trying to initialise the fanotify watcher: {}",
-                    e
-                ),
-            };
-            for cur_path in local_paths {
-                fd.add_path(
-                    FAN_CREATE | FAN_CLOSE_WRITE | FAN_MOVE_SELF | FAN_MODIFY,
-                    &cur_path,
-                )
-                .unwrap();
-            }
             let fd_handle = fd.as_fd();
             let mut fds = [PollFd::new(fd_handle.as_raw_fd(), PollFlags::POLLIN)];
             loop {
