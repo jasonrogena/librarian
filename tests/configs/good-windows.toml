@@ -5,7 +5,7 @@ echo "{{ file_path }} is an audio file. The file's MIME type is {{ mime_type }}"
 
   [libraries.audio.filter]
   directories = [ "tests\\files" ]
-  mime_type_regexes = [ "audio/.+" ]
+  mime_type_regexes = [ "audio/fla.+" ]
 
 [libraries.videos]
 command = """

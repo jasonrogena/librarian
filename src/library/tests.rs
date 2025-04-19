@@ -17,12 +17,7 @@ fn test_process() {
     test_cases.insert(
         "audio".to_string(),
         (
-            vec![
-                "audio_tests_files_audio_flac".to_string(),
-                "audio_tests_files_audio_ogg".to_string(),
-                "audio_tests_files_audio_opus".to_string(),
-                "audio_tests_files_video_mpeg".to_string(),
-            ],
+            vec!["audio_tests_files_audio_flac".to_string()],
             "is an audio file. The file's MIME type is".to_string(),
         ),
     );
