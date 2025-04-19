@@ -194,5 +194,5 @@ jobs:
           push: true
           tags: |
             ghcr.io/${{ env.CONTAINER_IMAGE_NAME }}:latest
-            ghcr.io/${{ env.CONTAINER_IMAGE_NAME }}:${{ needs.create-release.outputs.librarian_version }}
+            ghcr.io/${{ env.CONTAINER_IMAGE_NAME }}:${{ github.ref_name }}
           platforms: linux/amd64,linux/arm64,linux/arm/v7
