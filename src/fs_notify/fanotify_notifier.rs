@@ -65,7 +65,8 @@ impl FanotifyNotifier {
             fd.add_path(
                 FAN_CREATE | FAN_CLOSE_WRITE | FAN_MOVE_SELF | FAN_MODIFY,
                 &cur_path,
-            ).map_err(|err| Error::Faotify(err.to_string()))?;
+            )
+            .map_err(|err| Error::Faotify(err.to_string()))?;
         }
         thread::spawn(move || {
             let fd_handle = fd.as_fd();
