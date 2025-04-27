@@ -1,5 +1,5 @@
 # Use the Rust version in Cargo.toml
-FROM rust:1.77 AS builder
+FROM rust:1.86 AS builder
 WORKDIR /librarian/
 COPY ./ ./
 RUN cargo build --release
