@@ -4,9 +4,9 @@ use tokio_util::sync::CancellationToken;
 #[cfg(target_os = "linux")]
 use {
     super::FsOp,
-    fanotify::{
-        high_level::{FanEvent, Fanotify, FanotifyMode},
-        low_level::{FAN_CLOSE_WRITE, FAN_CREATE, FAN_MODIFY, FAN_MOVE_SELF},
+    fanotify::high_level::{
+        FanEvent, Fanotify, FanotifyMode, FAN_ACCESS, FAN_CLOSE, FAN_CLOSE_WRITE,
+        FAN_EVENT_ON_CHILD, FAN_MODIFY, FAN_ONDIR,
     },
     nix::poll::{poll, PollFd, PollFlags},
     std::os::fd::AsFd,
@@ -20,7 +20,7 @@ pub enum Error {
     #[error("The feature '{0}' is unsupported")]
     UnsupportedFeature(String),
     #[error("An error was thrown by the filesystem notification system: {0}")]
-    Faotify(String),
+    Fanotify(String),
     #[error("An error was thrown while trying to interract with the notification system")]
     Send(#[from] std::sync::mpsc::SendError<bool>),
 }
@@ -59,14 +59,27 @@ impl FanotifyNotifier {
         let local_paths = paths.clone();
         let fd = match Fanotify::new_nonblocking(FanotifyMode::NOTIF) {
             Ok(f) => f,
-            Err(e) => return Err(Error::Faotify(e.to_string())),
+            Err(e) => {
+                return Err(Error::Fanotify(
+                    format!("While initializing Fanotify object: {}", e).to_string(),
+                ))
+            }
         };
         for cur_path in local_paths {
             fd.add_path(
-                FAN_CREATE | FAN_CLOSE_WRITE | FAN_MOVE_SELF | FAN_MODIFY,
+                FAN_ACCESS
+                    | FAN_CLOSE
+                    | FAN_EVENT_ON_CHILD
+                    | FAN_MODIFY
+                    | FAN_ONDIR
+                    | FAN_CLOSE_WRITE,
                 &cur_path,
             )
-            .map_err(|err| Error::Faotify(err.to_string()))?;
+            .map_err(|err| {
+                Error::Fanotify(
+                    format!("While adding path '{}': {}", cur_path.display(), err).to_string(),
+                )
+            })?;
         }
         thread::spawn(move || {
             let fd_handle = fd.as_fd();
