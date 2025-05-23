@@ -36,4 +36,4 @@ tokio-util = "0.7.15"
 notify = { version = "8.0.0", default-features = false, features = ["macos_kqueue"] }
 [target.'cfg(target_os = "linux")'.dependencies]
 fanotify-rs = "0.3.1"
-nix = "0.26.4"
+nix = "0.30.1"
