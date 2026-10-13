@@ -8,9 +8,8 @@ use {
         FanEvent, Fanotify, FanotifyMode, FAN_ACCESS, FAN_CLOSE, FAN_CLOSE_WRITE,
         FAN_EVENT_ON_CHILD, FAN_MODIFY, FAN_ONDIR,
     },
-    nix::poll::{poll, PollFd, PollFlags},
+    nix::poll::{poll, PollFd, PollFlags, PollTimeout},
     std::os::fd::AsFd,
-    std::os::fd::AsRawFd,
     std::thread,
 };
 
@@ -82,10 +81,9 @@ impl FanotifyNotifier {
             })?;
         }
         thread::spawn(move || {
-            let fd_handle = fd.as_fd();
-            let mut fds = [PollFd::new(fd_handle.as_raw_fd(), PollFlags::POLLIN)];
+            let mut fds = [PollFd::new(fd.as_fd(), PollFlags::POLLIN)];
             loop {
-                let poll_num = poll(&mut fds, -1).unwrap();
+                let poll_num = poll(&mut fds, PollTimeout::NONE).unwrap();
                 if poll_num > 0 {
                     for event in fd.read_event() {
                         let notification = Notification {
