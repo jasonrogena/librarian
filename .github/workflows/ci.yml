@@ -5,8 +5,9 @@ on:
     branches:
       - main
   pull_request:
-    branches:
-      - '*'
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   ci:
     name: CI
@@ -16,75 +17,29 @@ jobs:
     steps:
       - name: Done
         run: exit 0
-  prepare:
-    name: Prepare
-    runs-on: ubuntu-latest
-    steps:
-      - uses: fkirc/skip-duplicate-actions@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
   test:
     name: Tests
-    needs:
-      - prepare
     strategy:
       fail-fast: false
       matrix:
-        rust:
-          - stable
         os:
           - windows-latest
           - macos-latest
           - ubuntu-latest
-        target:
-          - i686-pc-windows-msvc
-          - i686-unknown-linux-gnu
-          - x86_64-pc-windows-msvc
-          - x86_64-unknown-linux-gnu
-          - x86_64-apple-darwin
-        exclude:
-          - os: windows-latest
-            target: x86_64-apple-darwin
-          - os: windows-latest
-            target: x86_64-unknown-linux-gnu
-          - os: windows-latest
-            target: i686-unknown-linux-gnu
-          - os: macos-latest
-            target: i686-pc-windows-msvc
-          - os: macos-latest
-            target: x86_64-pc-windows-msvc
-          - os: macos-latest
-            target: x86_64-unknown-linux-gnu
-          - os: macos-latest
-            target: i686-unknown-linux-gnu
-          - os: ubuntu-latest
-            target: i686-pc-windows-msvc
-          - os: ubuntu-latest
-            target: x86_64-pc-windows-msvc
-          - os: ubuntu-latest
-            target: x86_64-apple-darwin
     runs-on: ${{ matrix.os }}
     steps:
-      - name: Install rust
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: ${{ matrix.rust }}
-          target: ${{ matrix.target }}
-          override: true
       - name: Checkout
-        uses: actions/checkout@v2
-      - name: Install linker
-        if: matrix.target == 'i686-unknown-linux-gnu'
-        run: |
-          sudo apt-get update
-          sudo apt-get install gcc-9-multilib lib32gcc-9-dev
+        uses: actions/checkout@v5
+      - name: Install rust
+        uses: dtolnay/rust-toolchain@stable
       - name: Run tests
         run: make clean test
       - name: Generate code coverage
         run: make clean coverage
-      - name: Upload test results to Codecov
+      - name: Upload code coverage to Codecov
         if: ${{ !cancelled() }}
-        uses: codecov/test-results-action@v1
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          files: target/lcov.info
+          flags: ${{ matrix.os }}
