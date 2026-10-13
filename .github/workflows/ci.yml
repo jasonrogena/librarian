@@ -38,7 +38,7 @@ jobs:
         run: make clean coverage
       - name: Upload code coverage to Codecov
         if: ${{ !cancelled() }}
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: target/lcov.info
