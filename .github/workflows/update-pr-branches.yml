@@ -1,0 +1,52 @@
+name: Update PR branches
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}
+
+permissions: {}
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    if: github.repository == 'jasonrogena/librarian'
+    steps:
+      # A GitHub App token is used instead of GITHUB_TOKEN so that the pushes
+      # to the PR branches trigger CI.
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.AUTOMATION_APP_ID }}
+          private-key: ${{ secrets.AUTOMATION_APP_PRIVATE_KEY }}
+
+      # Only the oldest PR whose checks have all passed (or are still running)
+      # is updated. Once it merges, the push to main runs this workflow again
+      # for the next one.
+      - name: Update the oldest passing PR that has auto-merge enabled
+        run: |
+          pr=$(gh pr list --base main --state open --json number,autoMergeRequest,mergeable,statusCheckRollup --jq '
+            map(select(
+              .autoMergeRequest != null
+              and .mergeable != "CONFLICTING"
+              and (.statusCheckRollup | length > 0)
+              and all(.statusCheckRollup[];
+                if .state then .state | IN("SUCCESS", "PENDING")
+                else .status != "COMPLETED" or (.conclusion | IN("SUCCESS", "SKIPPED", "NEUTRAL"))
+                end)
+            ))
+            | sort_by(.number)
+            | .[0].number // empty')
+          if [ -z "$pr" ]; then
+            echo "No PRs to update"
+            exit 0
+          fi
+          gh api --method PUT "repos/$GH_REPO/pulls/$pr/update-branch" ||
+            echo "::warning::Could not update the branch for #$pr"
+        env:
+          GH_REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}

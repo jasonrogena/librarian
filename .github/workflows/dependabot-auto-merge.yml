@@ -11,19 +11,24 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.pull_request.user.login == 'dependabot[bot]' && github.repository == 'jasonrogena/librarian'
     steps:
-      - name: Update branch with main
-        run: gh api --method PUT "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/update-branch" || true
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Approve the PR
         run: gh pr review --approve "$PR_URL"
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      # Merges done by GITHUB_TOKEN don't trigger workflows, so auto-merge is
+      # enabled with a GitHub App token to make sure the push to main triggers
+      # CI and the update-pr-branches workflow.
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.AUTOMATION_APP_ID }}
+          private-key: ${{ secrets.AUTOMATION_APP_PRIVATE_KEY }}
+
       - name: Enable auto-merge
         run: gh pr merge --auto --merge "$PR_URL"
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
