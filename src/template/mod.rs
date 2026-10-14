@@ -21,7 +21,7 @@ impl Template {
     pub fn render(&self, data: &collections::HashMap<&str, &str>) -> Result<String, Error> {
         let mut context = tera::Context::new();
         for (cur_key, cur_val) in data {
-            context.insert(*cur_key, *cur_val);
+            context.insert(cur_key.to_string(), *cur_val);
         }
 
         Ok(tera::Tera::one_off(self.tmpl.as_str(), &context, false)?)
