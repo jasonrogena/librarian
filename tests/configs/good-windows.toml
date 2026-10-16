@@ -1,6 +1,6 @@
 [libraries.audio]
 command = """
-echo "{{ file_path }} is an audio file. The file's MIME type is {{ mime_type }}" > tests\\tmp\\audio_{{ file_path | replace(from="\\", to="_") }}
+echo "{{ file_path }} is an audio file. The file's MIME type is {{ mime_type }}" > tests\\tmp\\audio_{{ file_path | replace(from="\\\\", to="_") }}
 """
 
   [libraries.audio.filter]
@@ -9,7 +9,7 @@ echo "{{ file_path }} is an audio file. The file's MIME type is {{ mime_type }}"
 
 [libraries.videos]
 command = """
-echo "{{ file_path }} is a video. The file's MIME type is {{ mime_type }}" > tests\\tmp\\video_{{ file_path | replace(from="\\", to="_") }}
+echo "{{ file_path }} is a video. The file's MIME type is {{ mime_type }}" > tests\\tmp\\video_{{ file_path | replace(from="\\\\", to="_") }}
 """
 
   [libraries.videos.filter]
@@ -18,7 +18,7 @@ echo "{{ file_path }} is a video. The file's MIME type is {{ mime_type }}" > tes
 
 [libraries.books]
 command = """
-echo "{{ file_path }} is a book. The file's MIME type is {{ mime_type }}"  > tests\\tmp\\books_{{ file_path | replace(from="\\", to="_") }}
+echo "{{ file_path }} is a book. The file's MIME type is {{ mime_type }}"  > tests\\tmp\\books_{{ file_path | replace(from="\\\\", to="_") }}
 """
 
   [libraries.books.filter]
