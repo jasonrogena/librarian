@@ -127,10 +127,6 @@ impl Notifier for FanotifyNotifier {
     }
 
     fn is_supported(&self) -> bool {
-        if OS != "linux" {
-            return false;
-        }
-
-        true
+        OS == "linux"
     }
 }
