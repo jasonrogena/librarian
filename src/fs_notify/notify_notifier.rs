@@ -97,10 +97,6 @@ impl Notifier for NotifyNotifier {
     }
 
     fn is_supported(&self) -> bool {
-        if OS == "windows" {
-            return false;
-        }
-
-        true
+        OS != "windows"
     }
 }
